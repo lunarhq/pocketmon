@@ -129,6 +129,7 @@ func queryBalance(addr string) (map[string]interface{}, error) {
 	}
 	data, err := json.Marshal(s)
 	if err != nil {
+		//
 		return nil, err
 	}
 
