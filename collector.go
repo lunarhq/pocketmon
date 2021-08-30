@@ -143,7 +143,7 @@ func queryBalance(addr string) (map[string]interface{}, error) {
 	defer r.Body.Close()
 
 	var result map[string]interface{}
-	err = json.NewDecoder(r.Body).Decode(result)
+	err = json.NewDecoder(r.Body).Decode(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func queryNode(addr string) (map[string]interface{}, error) {
 	defer r.Body.Close()
 
 	var result map[string]interface{}
-	err = json.NewDecoder(r.Body).Decode(result)
+	err = json.NewDecoder(r.Body).Decode(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func queryStatus() (map[string]interface{}, error) {
 	defer r.Body.Close()
 
 	var result map[string]interface{}
-	err = json.NewDecoder(r.Body).Decode(result)
+	err = json.NewDecoder(r.Body).Decode(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -290,10 +290,12 @@ func collectStats() (Stats, error) {
 	}
 	hs, err := collectHostStats()
 	if err != nil {
+		log.Println("err host stats:")
 		return s, err
 	}
 	ns, err := collectNodeStats()
 	if err != nil {
+		log.Println("err node stats:")
 		return s, err
 	}
 
