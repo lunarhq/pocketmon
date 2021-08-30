@@ -9,9 +9,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os/exec"
 	"runtime"
-	"strings"
+	"strconv"
 	"time"
 
 	"github.com/shirou/gopsutil/cpu"
@@ -33,7 +32,7 @@ type NodeStats struct {
 	Chain           string   `json:"chain"`
 	AppVersion      string   `json:"app_version"`
 	Moniker         string   `json:"moniker"`
-	Height          string   `json:"height"`
+	Height          int64    `json:"height"`
 	LatestBlockTime string   `json:latest_block_time`
 	CatchingUp      bool     `json:"catching_up"`
 	Balance         float64  `json:"balance"`
@@ -196,6 +195,23 @@ func queryStatus() (map[string]interface{}, error) {
 
 	return result, nil
 }
+func queryVersion() (string, error) {
+	url := "http://localhost:8082/v1"
+	r, err := client.Get(url)
+	if err != nil {
+		return "", err
+	}
+
+	defer r.Body.Close()
+
+	var result string
+	err = json.NewDecoder(r.Body).Decode(&result)
+	if err != nil {
+		return "", err
+	}
+
+	return result, nil
+}
 
 func collectNodeStats() (NodeStats, error) {
 	s := NodeStats{
@@ -203,11 +219,11 @@ func collectNodeStats() (NodeStats, error) {
 	}
 
 	//Get version
-	cmd, err := exec.Command("pocket", "version").Output()
+	ver, err := queryVersion()
 	if err != nil {
 		return s, err
 	}
-	s.AppVersion = strings.ReplaceAll(string(cmd), "AppVersion: ", "")
+	s.AppVersion = ver
 
 	statusResp, err := queryStatus()
 	if err != nil {
@@ -223,7 +239,11 @@ func collectNodeStats() (NodeStats, error) {
 	s.Address = nodeInfo["id"].(string)
 	s.Moniker = nodeInfo["moniker"].(string)
 	syncInfo := status["sync_info"].(map[string]interface{})
-	s.Height = syncInfo["latest_block_height"].(string)
+	h, err := strconv.ParseInt(syncInfo["latest_block_height"].(string), 10, 64)
+	if err != nil {
+		return s, err
+	}
+	s.Height = h
 	s.LatestBlockTime = syncInfo["latest_block_time"].(string)
 	s.CatchingUp = syncInfo["catching_up"].(bool)
 
