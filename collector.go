@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	sleepTime = 5 * time.Second
+	sleepTime = 3 * time.Minute
 	endpoint  = "https://injest.lunar.dev"
 )
 
@@ -115,7 +115,7 @@ func sendStats(node string, key string, s Stats) error {
 	if resp.StatusCode > 399 {
 		defer resp.Body.Close()
 		body, _ := ioutil.ReadAll(resp.Body)
-		fmt.Printf("Error: %d %s\n", resp.StatusCode, string(body))
+		return errors.New(fmt.Sprintf("%d %s\n", resp.StatusCode, string(body)))
 	}
 	return nil
 }
@@ -327,29 +327,32 @@ func collectStats() (Stats, error) {
 	return s, nil
 }
 
+func collectAndSend(node, key string) {
+	stats, err := collectStats()
+	if err != nil {
+		log.Println("Err collecting stats:", err)
+		return
+	}
+
+	err = sendStats(node, key, stats)
+	if err != nil {
+		log.Println("Err sending stats:", err)
+		return
+	}
+}
+
 func start(ctx context.Context, node, key string, daemon bool) {
 	fmt.Printf(`Started monitoring node: %s
 You can view health status at https://lunar.dev/app
 `, node)
 	ticker := time.NewTicker(sleepTime)
-	// collectStats() //Do once
-	// sendStats() //@Todo Do once
+	collectAndSend()
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			stats, err := collectStats()
-			if err != nil {
-				log.Println("Err collecting stats:", err)
-				continue
-			}
-
-			err = sendStats(node, key, stats)
-			if err != nil {
-				log.Println("Err sending stats:", err)
-				continue
-			}
+			collectAndSend(node, key)
 		}
 	}
 }
