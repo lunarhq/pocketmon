@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	sleepTime = 3 * time.Minute
+	sleepTime = 5 * time.Minute
 	endpoint  = "https://injest.lunar.dev"
 )
 
