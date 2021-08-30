@@ -219,9 +219,9 @@ func collectNodeStats() (NodeStats, error) {
 		return s, errors.New("Invalid data from /status call")
 	}
 
-	nodeInfo := status["node_info"].(map[string]string)
-	s.Address = nodeInfo["id"]
-	s.Moniker = nodeInfo["moniker"]
+	nodeInfo := status["node_info"].(map[string]interface{})
+	s.Address = nodeInfo["id"].(string)
+	s.Moniker = nodeInfo["moniker"].(string)
 	syncInfo := status["sync_info"].(map[string]interface{})
 	s.Height = syncInfo["latest_block_height"].(string)
 	s.LatestBlockTime = syncInfo["latest_block_time"].(string)
