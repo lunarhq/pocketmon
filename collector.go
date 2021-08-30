@@ -231,7 +231,7 @@ func collectNodeStats() (NodeStats, error) {
 	if err != nil {
 		return s, err
 	}
-	s.Chains = nodeResp["chains"].([]string)
+	// s.Chains = nodeResp["chains"].([]string)
 	s.PublicKey = nodeResp["public_key"].(string)
 	s.Jailed = nodeResp["jailed"].(bool)
 	s.ServiceUrl = nodeResp["service_url"].(string)
