@@ -129,7 +129,7 @@ func queryBalance(addr string) (map[string]interface{}, error) {
 	}
 	data, err := json.Marshal(s)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
@@ -137,7 +137,7 @@ func queryBalance(addr string) (map[string]interface{}, error) {
 
 	r, err := client.Do(req)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	defer r.Body.Close()
 
@@ -239,7 +239,7 @@ func collectNodeStats() (NodeStats, error) {
 	if err != nil {
 		return s, err
 	}
-	s.Balance = nodeResp["balance"].(int64)
+	s.Balance = balResp["balance"].(int64)
 
 	return s, nil
 }
