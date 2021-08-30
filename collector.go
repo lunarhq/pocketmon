@@ -346,7 +346,7 @@ func start(ctx context.Context, node, key string, daemon bool) {
 You can view health status at https://lunar.dev/app
 `, node)
 	ticker := time.NewTicker(sleepTime)
-	collectAndSend()
+	collectAndSend(node, key)
 	for {
 		select {
 		case <-ctx.Done():
