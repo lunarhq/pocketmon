@@ -36,7 +36,7 @@ type NodeStats struct {
 	Height          string   `json:"height"`
 	LatestBlockTime string   `json:latest_block_time`
 	CatchingUp      bool     `json:"catching_up"`
-	Balance         int64    `json:"balance"`
+	Balance         float64  `json:"balance"`
 	Chains          []string `json:"chains"`
 	Jailed          bool     `json:"jailed"`
 	ServiceUrl      string   `json:"service_url"`
@@ -240,7 +240,7 @@ func collectNodeStats() (NodeStats, error) {
 	if err != nil {
 		return s, err
 	}
-	s.Balance = balResp["balance"].(int64)
+	s.Balance = balResp["balance"].(float64)
 
 	return s, nil
 }
